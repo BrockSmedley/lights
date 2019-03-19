@@ -1,24 +1,63 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
+import axios from 'axios';
+
+const SERVER_URL = "http://192.168.0.7"
+const logo = "/dong.png"
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+	    red: false,
+	    green: false,
+	    blue: false,
+	    power: false
+    }
+    this.onClick = this.onClick.bind(this);
+  }
+  async onClick(e){
+    e.persist();
+    let res = await axios.get(`${SERVER_URL}:5000/${e.target.id}`);
+    if (e.target.id == "kill"){
+      this.setState({ 
+        red: false, 
+        green: false, 
+        blue: false, 
+        power: false}
+      );
+    }
+    else {
+      await this.setState({
+        [e.target.id]: !this.state[e.target.id]
+      });
+    }
+    
+    await console.log(this.state);
+  }
   render() {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
+          <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossOrigin="anonymous" />
+          
+          <img src={logo} className={`App-logo ${!this.state.power ? 'meatspin' : ''}`} alt="logo" />
           <p>
-            Edit <code>src/App.js</code> and save to reload.
+            PULL THE FUCKIN TRIGGER BITCH
           </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
+          <div className="status">
+            <span>{this.state.red ? "R" : "_"}</span>
+            <span>{this.state.green ? "G" : "_"}</span>
+            <span>{this.state.blue ? "B" : "_"}</span>
+          </div>
+          
+          <div className="container">
+            <button type="button" className="btn btn-danger" id="red" onClick={this.onClick}>Red</button>
+            <button type="button" className="btn btn-success" id="green" onClick={this.onClick}>Green</button>
+            <button type="button" className="btn btn-primary" id="blue" onClick={this.onClick}>Blue</button>
+            <button type="button" className="btn btn-light" id="power" onClick={this.onClick}>Power</button>
+            <button type="button" className="btn btn-dark" id="kill" onClick={this.onClick}>Reset</button>
+          </div>
         </header>
       </div>
     );
