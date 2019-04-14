@@ -15,10 +15,26 @@ class App extends Component {
 	    power: false
     }
     this.onClick = this.onClick.bind(this);
+    this.componentDidMount = this.componentDidMount.bind(this);
   }
+  
+  async componentDidMount() {
+    let res = await axios.get(`${SERVER_URL}:5000/status`);
+    console.log("status: ", res.data);
+    let s = res.data;
+    await this.setState({
+	    power: !Boolean(s[0]),
+	    red: !Boolean(s[1]),
+	    green: !Boolean(s[2]),
+	    blue: !Boolean(s[3])
+    });
+    await console.log("STATE: ", this.state);
+  }
+  
   async onClick(e){
     e.persist();
     let res = await axios.get(`${SERVER_URL}:5000/${e.target.id}`);
+    console.log("res: ", res);
     if (e.target.id == "kill"){
       this.setState({ 
         red: false, 
@@ -35,6 +51,7 @@ class App extends Component {
     
     await console.log(this.state);
   }
+
   render() {
     return (
       <div className="App">
@@ -56,7 +73,6 @@ class App extends Component {
             <button type="button" className="btn btn-success" id="green" onClick={this.onClick}>Green</button>
             <button type="button" className="btn btn-primary" id="blue" onClick={this.onClick}>Blue</button>
             <button type="button" className="btn btn-light" id="power" onClick={this.onClick}>Power</button>
-            <button type="button" className="btn btn-dark" id="kill" onClick={this.onClick}>Reset</button>
           </div>
         </header>
       </div>
